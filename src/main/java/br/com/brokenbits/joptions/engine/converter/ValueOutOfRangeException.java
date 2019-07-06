@@ -31,7 +31,7 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public class ValueOutOfRangeException extends IllegalArgumentException {
+public class ValueOutOfRangeException extends InvalidValueException {
 
 	private static final long serialVersionUID = 1L;
 

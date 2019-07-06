@@ -31,7 +31,7 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public class ValueTooLongException extends IllegalArgumentException {
+public class ValueTooLongException extends InvalidValueException {
 
 	private static final long serialVersionUID = 1L;
 

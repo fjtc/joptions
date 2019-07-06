@@ -29,60 +29,24 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package br.com.brokenbits.joptions.engine.converter;
+package br.com.brokenbits.joptions.engine;
 
-import java.util.regex.Pattern;
+public class InvalidParameterConverterException extends IllegalArgumentException {
 
-import br.com.brokenbits.joptions.annotations.OptionParameter;
+	private static final long serialVersionUID = 1L;
 
-public class StringParameterConverter implements ParameterConverter {
-
-	protected int minLength = 0;
-	
-	protected int maxLength = Integer.MAX_VALUE;
-	
-	protected Pattern pattern;
-	
-	@Override
-	public Object convert(String value, Class<?> type) throws IllegalArgumentException {
-
-		if (!type.equals(String.class)) {
-			throw new IllegalArgumentException("Incompatible type.");
-		}
-		if (value.length() < this.minLength) {
-			throw new ValueTooShortException();
-		}
-		if (value.length() > this.maxLength) {
-			throw new ValueTooLongException();
-		}
-		if (this.pattern != null) {
-			if (!this.pattern.matcher(value).matches()) {
-				throw new InvalidStringValueException();
-			}
-		}
-		return value;
+	public InvalidParameterConverterException() {
 	}
 
-	@Override
-	public void init(OptionParameter p) throws IllegalArgumentException {
-		
-		this.minLength = p.minLength();
-		if (this.minLength < 0) {
-			throw new IllegalArgumentException("minLength cannot be negative.");
-		}
-		this.maxLength = p.maxLength();
-		if (this.minLength > this.maxLength) {
-			throw new IllegalArgumentException("minLength is larger than maxLength.");
-		}
-		
-		String v = p.regex();
-		if ((v != null) && (!v.isBlank())) {
-			this.pattern = Pattern.compile(v);
-		}
+	public InvalidParameterConverterException(String s) {
+		super(s);
 	}
 
-	@Override
-	public boolean isCompatible(Class<?> type) {
-		return type.isAssignableFrom(String.class);
+	public InvalidParameterConverterException(Throwable cause) {
+		super(cause);
+	}
+
+	public InvalidParameterConverterException(String message, Throwable cause) {
+		super(message, cause);
 	}
 }

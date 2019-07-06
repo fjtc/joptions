@@ -44,5 +44,6 @@ public @interface OptionParameter {
 	public int numberBase() default 10;
 	public String minValue() default "";
 	public String maxValue() default "";
+	public String regex() default "";
 	public Class<?> converter() default Object.class;
 }
