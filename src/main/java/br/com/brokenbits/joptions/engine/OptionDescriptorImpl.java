@@ -11,9 +11,9 @@ public class OptionDescriptorImpl {
 	private final String name;
 	private final String description;
 	private final boolean required;
-	private final int maxOccurencies;
+	private final int maxRepetitions;
 	private final Set<String> conflictsWithList;
-	private final OptionConverterDescriptionImpl converter;
+	private final OptionParameterImpl converter;
 	
 	private int count = 0;
 	
@@ -26,13 +26,13 @@ public class OptionDescriptorImpl {
 		}
 		this.name = annotation.name();
 		this.description = annotation.description();
-		this.maxOccurencies = annotation.maxOccurencies();
+		this.maxRepetitions = annotation.maxRepetitions();
 		this.required = annotation.required();
 		this.conflictsWithList = new HashSet<String>();
 		for (String v: annotation.conflictsWith()) {
 			this.conflictsWithList.add(v);
 		}
-		this.converter = OptionConverterDescriptionImpl.parse(method);
+		this.converter = OptionParameterImpl.parse(method);
 	}
 
 	public String getName() {
@@ -48,13 +48,13 @@ public class OptionDescriptorImpl {
 	}
 
 	public int getMaxOccurencies() {
-		return maxOccurencies;
+		return maxRepetitions;
 	}
 
 	public boolean registerOccurency() {
 		this.count++;
-		if (this.maxOccurencies > 0) {
-			return this.count <= this.maxOccurencies;
+		if (this.maxRepetitions > 0) {
+			return this.count <= this.maxRepetitions;
 		} else {
 			return true;
 		}
@@ -64,7 +64,27 @@ public class OptionDescriptorImpl {
 		return conflictsWithList.contains(other);
 	}
 	
+	/**
+	 * Resets the number of invocations of this option.
+	 */
 	public void reset() {
 		this.count = 0;
+	}
+	
+	/**
+	 * Parses the given method to see if it defines an option or not.
+	 * 
+	 * @param method The method to be verified.
+	 * @return The OptionDescriptorImpl that represents the option or null if the method is
+	 * not suitable to be an option.
+	 */
+	public static OptionDescriptorImpl parse(Method method) {
+		
+		OptionDescriptor desc = method.getAnnotation(OptionDescriptor.class);
+		if (desc == null) {
+			return null;
+		} else {
+			return new OptionDescriptorImpl(method);
+		}
 	}
 }

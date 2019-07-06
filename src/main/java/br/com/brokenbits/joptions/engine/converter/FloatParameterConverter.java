@@ -31,46 +31,74 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public class DoubleOptionConverter extends BaseOptionConverter<Double> {
+import br.com.brokenbits.joptions.annotations.OptionParameter;
 
-	protected double minValue = Float.MIN_VALUE;
+public class FloatParameterConverter implements ParameterConverter {
+
+	protected float minValue = Float.MIN_VALUE;
 	
-	protected double maxValue = Float.MAX_VALUE;
+	protected float maxValue = Float.MAX_VALUE;
 	
-	public Double convert(String value) throws IllegalArgumentException {
-		this.assertLength(value.length());
-		double v;
+	public FloatParameterConverter() {
+	}
+
+	@Override
+	public Object convert(String value, Class<?> type) throws IllegalArgumentException {
+		float v;
 		
 		try {
-			v = Double.parseDouble(value);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidDoubleValueException();
+			v = Float.parseFloat(value);
+		} catch (Exception e) {
+			throw new InvalidFloatValueException(e);
 		}
+		
 		if ((v < this.minValue) || (v > this.maxValue)) {
 			throw new ValueOutOfRangeException();
 		}
-		return v;
+
+		if (Float.TYPE.equals(type) || Float.class.equals(type)) {
+			return Float.valueOf(v);
+		} else if (Double.TYPE.equals(type) || Double.class.equals(type)) {
+			return Double.valueOf(v);
+		} else if (String.class.equals(type)) {
+			return value;
+		} else {
+			throw new InvalidConverterParameterException(String.format("Type is not supported.", type.getName()));
+		}
 	}
-	
+
 	@Override
-	public void setValueRange(String min, String max) throws IllegalArgumentException {
+	public void init(OptionParameter p) throws IllegalArgumentException {
+		String v;
 		
-		if (!min.isBlank()) {
+		v = p.minValue();
+		if ((v != null) && (!v.isBlank())) {
 			try {
-				this.minValue = Double.parseDouble(min);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Invalid minimum value.");
+				this.minValue = Float.parseFloat(v);
+			} catch (Exception e) {
+				throw new InvalidConverterParameterException("Invalid minValue.");
 			}
 		}
-		if (!max.isBlank()) {
+		v = p.maxValue();
+		if ((v != null) && (!v.isBlank())) {
 			try {
-				this.maxValue = Double.parseDouble(max);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Invalid maximum value.");
+				this.maxValue = Float.parseFloat(v);
+			} catch (Exception e) {
+				throw new InvalidConverterParameterException("Invalid maxValue.");
 			}
 		}
-		if (this.minLength > this.maxLength) {
-			throw new IllegalArgumentException("Minumum value is larger than maximum value.");
+		if (this.minValue > this.maxValue) {
+			throw new InvalidConverterParameterException("minValue is larger than maxValue.");
 		}
+	}
+
+	@Override
+	public boolean isCompatible(Class<?> type) {
+		return 
+				type.equals(String.class) ||
+				type.equals(Float.class) ||
+				type.equals(Float.TYPE) ||
+				type.equals(Double.class) || 
+				type.equals(Double.TYPE);
 	}
 }

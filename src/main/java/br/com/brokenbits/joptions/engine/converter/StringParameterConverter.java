@@ -31,46 +31,41 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public class FloatOptionConverter extends BaseOptionConverter<Float> {
+import br.com.brokenbits.joptions.annotations.OptionParameter;
 
-	protected float minValue = Float.MIN_VALUE;
+public class StringParameterConverter implements ParameterConverter {
+
+	private int minLength = 0;
 	
-	protected float maxValue = Float.MAX_VALUE;
-	
-	public Float convert(String value) throws IllegalArgumentException {
-		this.assertLength(value.length());
-		float v;
-		
-		try {
-			v = Float.parseFloat(value);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidFloatValueException();
-		}
-		if ((v < this.minValue) || (v > this.maxValue)) {
-			throw new ValueOutOfRangeException();
-		}
-		return v;
-	}
+	private int maxLength = Integer.MAX_VALUE;
 	
 	@Override
-	public void setValueRange(String min, String max) throws IllegalArgumentException {
+	public Object convert(String value, Class<?> type) throws IllegalArgumentException {
+
+		if (!type.equals(String.class)) {
+			throw new IllegalArgumentException("Incompatible type.");
+		}
+		if (value.length() < this.minLength) {
+			throw new ValueTooShortException();
+		}
+		if (value.length() > this.maxLength) {
+			throw new ValueTooLongException();
+		}
+		return value;
+	}
+
+	@Override
+	public void init(OptionParameter p) throws IllegalArgumentException {
 		
-		if (!min.isBlank()) {
-			try {
-				this.minValue = Float.parseFloat(min);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Invalid minimum value.");
-			}
-		}
-		if (!max.isBlank()) {
-			try {
-				this.maxValue = Float.parseFloat(max);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Invalid maximum value.");
-			}
-		}
+		this.minLength = p.minLength();
+		this.maxLength = p.maxLength();
 		if (this.minLength > this.maxLength) {
-			throw new IllegalArgumentException("Minumum value is larger than maximum value.");
+			throw new IllegalArgumentException("minLength is larger than maxLength.");
 		}
+	}
+
+	@Override
+	public boolean isCompatible(Class<?> type) {
+		return type.isAssignableFrom(String.class);
 	}
 }

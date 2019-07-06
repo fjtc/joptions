@@ -39,9 +39,24 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface OptionDescriptor {
+	/**
+	 * Name.
+	 */
 	public String name();
+	/**
+	 * Description.
+	 */
 	public String description() default "";
+	/**
+	 * Denotes if it is required or not.
+	 */
 	public boolean required() default false;
-	public int maxOccurencies() default -1;
+	/**
+	 * Maximum number of times this option may appear.
+	 */
+	public int maxRepetitions() default 1;
+	/**
+	 * List of conflicting options.
+	 */
 	public String[] conflictsWith() default {};
  }

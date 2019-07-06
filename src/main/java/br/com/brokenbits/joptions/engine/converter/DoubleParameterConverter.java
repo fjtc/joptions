@@ -31,31 +31,71 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public abstract class BaseOptionConverter<T> implements OptionConverter<T>  {
+import br.com.brokenbits.joptions.annotations.OptionParameter;
+
+public class DoubleParameterConverter implements ParameterConverter {
+
+	protected double minValue = Double.MIN_VALUE;
 	
-	protected int minLength;
+	protected double maxValue = Double.MAX_VALUE;
 	
-	protected int maxLength;
-	
-	protected void assertLength(int length) throws IllegalArgumentException {
-		if (length < this.minLength) {
-			throw new ValueTooShortException();
+	public DoubleParameterConverter() {
+	}
+
+	@Override
+	public Object convert(String value, Class<?> type) throws IllegalArgumentException {
+		double v;
+		
+		try {
+			v = Double.parseDouble(value);
+		} catch (Exception e) {
+			throw new InvalidDoubleValueException(e);
 		}
-		if (length > this.maxLength) {
-			throw new ValueTooLongException();
+		
+		if ((v < this.minValue) || (v > this.maxValue)) {
+			throw new ValueOutOfRangeException();
+		}
+
+		if (Double.TYPE.equals(type) || Double.class.equals(type)) {
+			return Double.valueOf(v);
+		} else if (String.class.equals(type)) {
+			return value;
+		} else {
+			throw new InvalidConverterParameterException(String.format("Type is not supported.", type.getName()));
 		}
 	}
 
 	@Override
-	public void setMinMaxLength(int minLength, int maxLength) {
-		this.minLength = minLength;
-		this.maxLength = maxLength;
-		if (this.minLength > this.maxLength) {
-			throw new IllegalArgumentException("Minumum length cannot be larger than or equal maximum length.");
+	public void init(OptionParameter p) throws IllegalArgumentException {
+		String v;
+		
+		v = p.minValue();
+		if ((v != null) && (!v.isBlank())) {
+			try {
+				this.minValue = Double.parseDouble(v);
+			} catch (Exception e) {
+				throw new InvalidConverterParameterException("Invalid minValue.");
+			}
+		}
+		v = p.maxValue();
+		if ((v != null) && (!v.isBlank())) {
+			try {
+				this.maxValue = Double.parseDouble(v);
+			} catch (Exception e) {
+				throw new InvalidConverterParameterException("Invalid maxValue.");
+			}
+		}
+		if (this.minValue > this.maxValue) {
+			throw new InvalidConverterParameterException("minValue is larger than maxValue.");
 		}
 	}
-	
+
 	@Override
-	public void setValueRange(String min, String max) throws IllegalArgumentException {
+	public boolean isCompatible(Class<?> type) {
+		return 
+				type.equals(String.class) ||
+				type.equals(Float.TYPE) ||
+				type.equals(Double.class) || 
+				type.equals(Double.TYPE);
 	}
 }

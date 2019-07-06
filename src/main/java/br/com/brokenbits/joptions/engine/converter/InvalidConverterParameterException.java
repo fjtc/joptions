@@ -31,12 +31,22 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public class StringOptionConverter extends BaseOptionConverter<String> {
-	
-	public String convert(String value) throws IllegalArgumentException {
-		this.assertLength(value.length());
-		return value;
+public class InvalidConverterParameterException extends IllegalArgumentException {
+
+	private static final long serialVersionUID = 1L;
+
+	public InvalidConverterParameterException() {
 	}
-	
-	
+
+	public InvalidConverterParameterException(String s) {
+		super(s);
+	}
+
+	public InvalidConverterParameterException(Throwable cause) {
+		super(cause);
+	}
+
+	public InvalidConverterParameterException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

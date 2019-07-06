@@ -36,14 +36,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.com.brokenbits.joptions.engine.converter.StringOptionConverter;
-
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface OptionConverterDescriptor {
+public @interface OptionParameter {
 	public int minLength() default 0;
 	public int maxLength() default Integer.MAX_VALUE;
+	public int numberBase() default 10;
 	public String minValue() default "";
 	public String maxValue() default "";
-	public Class<?> converter() default StringOptionConverter.class;
+	public Class<?> converter() default Object.class;
 }

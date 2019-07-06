@@ -31,46 +31,13 @@
  */
 package br.com.brokenbits.joptions.engine.converter;
 
-public class LongOptionConverter extends BaseOptionConverter<Long> {
+import br.com.brokenbits.joptions.annotations.OptionParameter;
 
-	protected long minValue = Long.MIN_VALUE;
+public interface ParameterConverter {
 	
-	protected long maxValue = Long.MAX_VALUE;
+	public Object convert(String value, Class<?> type) throws IllegalArgumentException;
 	
-	public Long convert(String value) throws IllegalArgumentException {
-		this.assertLength(value.length());
-		Long v;
-		
-		try {
-			v = Long.parseLong(value);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidLongValueException();
-		}
-		if ((v < this.minValue) || (v > this.maxValue)) {
-			throw new ValueOutOfRangeException();
-		}
-		return v;
-	}
+	public void init(OptionParameter p) throws IllegalArgumentException;
 	
-	@Override
-	public void setValueRange(String min, String max) throws IllegalArgumentException {
-		
-		if (!min.isBlank()) {
-			try {
-				this.minValue = Long.parseLong(min);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Invalid minimum value.");
-			}
-		}
-		if (!max.isBlank()) {
-			try {
-				this.maxValue = Long.parseLong(max);
-			} catch (IllegalArgumentException e) {
-				throw new IllegalArgumentException("Invalid maximum value.");
-			}
-		}
-		if (this.minLength > this.maxLength) {
-			throw new IllegalArgumentException("Minumum value is larger than maximum value.");
-		}
-	}
+	public boolean isCompatible(Class<?> type);
 }
